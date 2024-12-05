@@ -8,8 +8,8 @@ import io
 from flask_cors import CORS
 import google.generativeai as genai
 
-# Initialize Gemini API
-genai.configure(api_key="AIzaSyDEEpr5mEHlHLN7_JeDzF-Rk5bBaF5RBFk")  # Replace with your API key
+
+genai.configure(api_key="API_KEY")  # Replace with your API key
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
