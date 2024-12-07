@@ -42,7 +42,7 @@ class _CommunityPageState extends State<CommunityPage> {
   }
 
   Future<void> fetchNews() async {
-    final String apiKey = "07d450754334b1027e96c6346d255106"; // Replace with your NewsAPI key
+    final String apiKey = "api_key"; // Replace with your NewsAPI key
     final String url =
         "https://gnews.io/api/v4/search?q=medical&apikey=$apiKey"; // Changed to medical keyword
 
