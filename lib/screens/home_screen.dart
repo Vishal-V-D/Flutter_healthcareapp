@@ -70,8 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   ServiceIcon(icon: Icons.people, title: "Doctors", color: Colors.blue),
                   ServiceIcon(icon: Icons.local_hospital, title: "Pharmacy", color: Colors.orange),
-                  ServiceIcon(icon: Icons.event, title: "Schedule", color: Colors.green),
-                  ServiceIcon(icon: Icons.settings, title: "Settings", color: Colors.red),
+                  ServiceIcon(icon: Icons.health_and_safety, title: "Health Tips", color: Colors.green),
+                  ServiceIcon(icon: Icons.emergency_outlined, title: "Emergency", color: Colors.red),
                 ],
               ),
               SizedBox(height: 20),

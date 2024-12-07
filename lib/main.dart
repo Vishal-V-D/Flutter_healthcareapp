@@ -51,10 +51,10 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _pages = [
     HomeScreen(),
     DoctorAppointmentPage(),
-    AIScreen(),
+    ChatBotScreen(),
     CommunityPage(),
     NotificationPage(),
-    ProfileScreen(),
+    MedicalProfilePage(),
     HistoryScreen(),
   ];
 
@@ -81,14 +81,19 @@ class _MainScreenState extends State<MainScreen> {
             _scaffoldKey.currentState?.openDrawer();
           },
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              radius: 8, // Adjusted profile icon size to match Bitcoin icon size
-              backgroundColor: Colors.white,
-              child: Icon(
-                Icons.person,
-                color: Colors.teal,
-                size: 24, // Adjusted to match Bitcoin icon size
+            padding: const EdgeInsets.all(6.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.teal.shade600, // Teal background for Account icon
+                borderRadius: BorderRadius.circular(12), // Rounded corners
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.person,
+                  color: Colors.white,
+                  size: 24,
+                ),
               ),
             ),
           ),
@@ -97,17 +102,30 @@ class _MainScreenState extends State<MainScreen> {
           IconButton(
             icon: Row(
               children: [
-                Icon(
-                  Icons.currency_bitcoin,
-                  color: Colors.amber, // Gold color for Bitcoin icon
-                ),
-                SizedBox(width: 4),
-                Text(
-                  '$_coinAmount', // Coin amount displayed next to the Bitcoin icon
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white, // White color for the coin amount
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 248, 247, 246), // Gold background for Bitcoin icon
+                    borderRadius: BorderRadius.circular(17), // Rounded corners
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.monetization_on_sharp,
+                          color: Colors.amber, // White icon color for Bitcoin
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          '$_coinAmount', // Coin amount displayed next to the Bitcoin icon
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: const Color.fromARGB(255, 47, 46, 46), // White text for coin amount
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -115,7 +133,7 @@ class _MainScreenState extends State<MainScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => BitcoinScreen()),
+                MaterialPageRoute(builder: (context) => MedcoinsScreen()),
               );
             },
           ),
@@ -143,7 +161,7 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Schedule',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat_rounded),
+            icon: Icon(Icons.star_border_purple500_outlined),
             label: 'AI Assist',
             activeIcon: Icon(Icons.chat_rounded, color: _currentIndex == 2 ? Colors.cyan : Colors.grey), // Color change when selected
           ),
@@ -199,7 +217,7 @@ class _MainScreenState extends State<MainScreen> {
               title: Text('Profile'),
               onTap: () {
                 Navigator.pop(context);
-                _navigateToScreen(ProfileScreen(), 'Profile');
+                _navigateToScreen(MedicalProfilePage(), 'Profile');
               },
             ),
             ListTile(
@@ -249,7 +267,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
               onTap: () {
                 Navigator.pop(context);
-                _navigateToScreen(SettingsScreen(), 'Settings');
+                _navigateToScreen(SettingsPage(), 'Settings');
               },
             ),
             ListTile(

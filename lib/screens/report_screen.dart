@@ -42,7 +42,7 @@ class _CommunityPageState extends State<CommunityPage> {
   }
 
   Future<void> fetchNews() async {
-    final String apiKey = "API_KEY"; // Replace with your NewsAPI key
+    final String apiKey = "07d450754334b1027e96c6346d255106"; // Replace with your NewsAPI key
     final String url =
         "https://gnews.io/api/v4/search?q=medical&apikey=$apiKey"; // Changed to medical keyword
 
@@ -258,9 +258,10 @@ class ProfileDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+
         title: Text(name),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: const Color.fromARGB(255, 29, 229, 255),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -313,7 +314,7 @@ class NewsDetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: const Color.fromARGB(255, 68, 255, 249),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

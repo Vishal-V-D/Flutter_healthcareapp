@@ -11,10 +11,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  image_picker: ^0.8.6+1 # To pick images from gallery or camera
-  
+
   http: ^1.2.2
   cupertino_icons: ^1.0.8
+  # Add the image picker for profile image functionality
 
 dev_dependencies:
   flutter_test:
@@ -22,3 +22,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # Assets for profile image or other media
+ 
+    # Optional: If you have a default image stored in the assets folder
