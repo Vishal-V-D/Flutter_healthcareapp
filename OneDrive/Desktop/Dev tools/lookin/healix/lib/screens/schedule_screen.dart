@@ -8,8 +8,23 @@ class AppointmentApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Doctor Appointment',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: BorderSide(color: Colors.blue.shade300),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: BorderSide(color: Colors.blue),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: BorderSide(color: Colors.blue.shade200),
+          ),
+        ),
+      ),
       home: DoctorAppointmentPage(),
     );
   }
@@ -26,25 +41,29 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
   // Form data variables
   String? _selectedDoctor;
   String? _selectedVenue;
+  String? _selectedHospital;
   DateTime? _selectedDate;
   String _patientName = '';
   String _patientContact = '';
   String _paymentMethod = '';
+  String? _selectedTimeSlot;
+  String? _selectedSpecialistIssue;
+  String? _appointmentMode;
+  String _additionalDetails = '';
 
-  // Dummy data for doctors and venues
+  // Dummy data for doctors, hospitals, and venues
   final List<Map<String, String>> _doctors = [
     {'name': 'Dr. Sarah', 'image': 'https://randomuser.me/api/portraits/women/44.jpg'},
     {'name': 'Dr. Mike', 'image': 'https://randomuser.me/api/portraits/men/46.jpg'},
     {'name': 'Dr. Emma', 'image': 'https://randomuser.me/api/portraits/women/47.jpg'},
     {'name': 'Dr. James', 'image': 'https://randomuser.me/api/portraits/men/48.jpg'},
     {'name': 'Dr. Anna', 'image': 'https://randomuser.me/api/portraits/women/49.jpg'},
-   {'name': 'Dr. Sarah', 'image': 'https://randomuser.me/api/portraits/women/44.jpg'},
-    {'name': 'Dr. Mike', 'image': 'https://randomuser.me/api/portraits/men/46.jpg'},
-    {'name': 'Dr. Emma', 'image': 'https://randomuser.me/api/portraits/women/47.jpg'},
-    {'name': 'Dr. James', 'image': 'https://randomuser.me/api/portraits/men/48.jpg'},
-    {'name': 'Dr. Anna', 'image': 'https://randomuser.me/api/portraits/women/49.jpg'},
   ];
   final List<String> _venues = ['City Hospital', 'Health Clinic', 'Downtown Office'];
+  final List<String> _hospitals = ['City Hospital', 'Greenwood Medical Center', 'Westside Clinic'];
+  final List<String> _timeSlots = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '3:00 PM'];
+  final List<String> _specialistIssues = ['Cardiology', 'Neurology', 'Orthopedics', 'Pediatrics'];
+  final List<String> _appointmentModes = ['In-person', 'Online', 'Hybrid'];
 
   // Function to pick a date
   Future<void> _pickDate(BuildContext context) async {
@@ -68,9 +87,32 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Appointment Confirmation'),
-          content: Text(
-              'Appointment successfully booked!\n\nDetails:\nDoctor: $_selectedDoctor\nDate: ${_selectedDate?.toLocal().toString().split(' ')[0]}\nVenue: $_selectedVenue\nPatient: $_patientName\nContact: $_patientContact\nPayment: $_paymentMethod'),
+          title: Text(
+            'Appointment Confirmation',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Appointment successfully booked!',
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(height: 10),
+              Text('Doctor: $_selectedDoctor'),
+              Text('Date: ${_selectedDate?.toLocal().toString().split(' ')[0]}'),
+              Text('Time: $_selectedTimeSlot'),
+              Text('Venue: $_selectedVenue'),
+              Text('Hospital: $_selectedHospital'),
+              Text('Mode: $_appointmentMode'),
+              Text('Specialist Issue: $_selectedSpecialistIssue'),
+              Text('Patient: $_patientName'),
+              Text('Contact: $_patientContact'),
+              Text('Payment: $_paymentMethod'),
+              SizedBox(height: 10),
+              if (_additionalDetails.isNotEmpty) Text('Additional Details: $_additionalDetails'),
+            ],
+          ),
           actions: [
             TextButton(
               onPressed: () {
@@ -165,6 +207,81 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
               ),
               SizedBox(height: 16),
 
+              // Time slot selection
+              Text(
+                'Select a Time Slot',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: 'Time Slot',
+                ),
+                items: _timeSlots
+                    .map((slot) => DropdownMenuItem(
+                          value: slot,
+                          child: Text(slot),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedTimeSlot = value;
+                  });
+                },
+                validator: (value) => value == null ? 'Please select a time slot' : null,
+              ),
+              SizedBox(height: 16),
+
+              // Specialist Issue selection
+              Text(
+                'Select Specialist Issue',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: 'Specialist Issue',
+                ),
+                items: _specialistIssues
+                    .map((issue) => DropdownMenuItem(
+                          value: issue,
+                          child: Text(issue),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedSpecialistIssue = value;
+                  });
+                },
+                validator: (value) => value == null ? 'Please select an issue' : null,
+              ),
+              SizedBox(height: 16),
+
+              // Appointment Mode selection
+              Text(
+                'Select Appointment Mode',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: 'Appointment Mode',
+                ),
+                items: _appointmentModes
+                    .map((mode) => DropdownMenuItem(
+                          value: mode,
+                          child: Text(mode),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _appointmentMode = value;
+                  });
+                },
+                validator: (value) => value == null ? 'Please select an appointment mode' : null,
+              ),
+              SizedBox(height: 16),
+
               // Venue selection
               Text(
                 'Select a Venue',
@@ -174,7 +291,6 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
               DropdownButtonFormField<String>(
                 decoration: InputDecoration(
                   labelText: 'Venue',
-                  border: OutlineInputBorder(),
                 ),
                 items: _venues
                     .map((venue) => DropdownMenuItem(
@@ -191,6 +307,31 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
               ),
               SizedBox(height: 16),
 
+              // Hospital selection
+              Text(
+                'Select a Hospital',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: 'Hospital',
+                ),
+                items: _hospitals
+                    .map((hospital) => DropdownMenuItem(
+                          value: hospital,
+                          child: Text(hospital),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedHospital = value;
+                  });
+                },
+                validator: (value) => value == null ? 'Please select a hospital' : null,
+              ),
+              SizedBox(height: 16),
+
               // Patient information
               Text(
                 'Patient Information',
@@ -200,7 +341,6 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
               TextFormField(
                 decoration: InputDecoration(
                   labelText: 'Patient Name',
-                  border: OutlineInputBorder(),
                 ),
                 onSaved: (value) {
                   _patientName = value!;
@@ -212,7 +352,6 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
               TextFormField(
                 decoration: InputDecoration(
                   labelText: 'Patient Contact',
-                  border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.phone,
                 onSaved: (value) {
@@ -220,6 +359,17 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
                 },
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Please enter your contact' : null,
+              ),
+              SizedBox(height: 16),
+
+              // Additional Details
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Additional Details (optional)',
+                ),
+                onSaved: (value) {
+                  _additionalDetails = value!;
+                },
               ),
               SizedBox(height: 16),
 
@@ -232,7 +382,6 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
               TextFormField(
                 decoration: InputDecoration(
                   labelText: 'Payment Method (e.g., Credit Card, Cash)',
-                  border: OutlineInputBorder(),
                 ),
                 onSaved: (value) {
                   _paymentMethod = value!;
@@ -249,6 +398,7 @@ class _DoctorAppointmentPageState extends State<DoctorAppointmentPage> {
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16),
                   textStyle: TextStyle(fontSize: 18),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
               ),
             ],

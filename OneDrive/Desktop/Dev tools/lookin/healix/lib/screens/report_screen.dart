@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(CommunityApp());
@@ -9,7 +11,7 @@ class CommunityApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Medical Community',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(primarySwatch: Colors.cyan),
       home: CommunityPage(),
     );
   }
@@ -29,28 +31,43 @@ class _CommunityPageState extends State<CommunityPage> {
     {'name': 'Dr. Anna', 'image': 'https://randomuser.me/api/portraits/women/49.jpg'},
   ];
 
-  final List<Map<String, String>> newsFeed = [
-    {
-      'title': '5 Tips for Better Heart Health',
-      'description': 'Simple lifestyle changes can greatly improve your heart health...',
-      'image': 'https://source.unsplash.com/featured/?heart,health',
-      'content': 'Detailed article on heart health tips...'
-    },
-    {
-      'title': 'COVID-19: What You Need to Know',
-      'description': 'Stay updated on the latest safety guidelines and vaccine updates...',
-      'image': 'https://source.unsplash.com/featured/?covid,health',
-      'content': 'Comprehensive COVID-19 safety and vaccine updates...'
-    },
-    {
-      'title': 'Mental Health Awareness',
-      'description': 'Understand the importance of mental well-being and seek help when needed...',
-      'image': 'https://source.unsplash.com/featured/?mentalhealth',
-      'content': 'An article focusing on mental health awareness and resources...'
-    },
-  ];
-
+  List<dynamic> newsFeed = [];
+  bool isLoading = true;
   String searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchNews();
+  }
+
+  Future<void> fetchNews() async {
+    final String apiKey = "07d450754334b1027e96c6346d255106"; // Replace with your NewsAPI key
+    final String url =
+        "https://gnews.io/api/v4/search?q=medical&apikey=$apiKey"; // Changed to medical keyword
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print(response.body);
+        setState(() {
+          newsFeed = data['articles'];
+          isLoading = false; // Stop loading when data is fetched
+        });
+      } else {
+        print("Failed to fetch news: ${response.statusCode}");
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching news: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +77,7 @@ class _CommunityPageState extends State<CommunityPage> {
         .toList();
     final filteredNews = newsFeed
         .where((news) =>
-            news['title']!.toLowerCase().contains(searchQuery.toLowerCase()))
+            news['title'].toString().toLowerCase().contains(searchQuery.toLowerCase()))
         .toList();
 
     return Scaffold(
@@ -147,72 +164,83 @@ class _CommunityPageState extends State<CommunityPage> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredNews.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    elevation: 6,
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => NewsDetailPage(
-                              title: filteredNews[index]['title']!,
-                              image: filteredNews[index]['image']!,
-                              content: filteredNews[index]['content']!,
-                            ),
+
+            // Loading indicator
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Expanded(
+                    child: ListView.builder(
+                      itemCount: filteredNews.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
                           ),
-                        );
-                      },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(15)),
-                            child: Image.network(
-                              filteredNews[index]['image']!,
-                              height: 150,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
+                          elevation: 6,
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NewsDetailPage(
+                                    title: filteredNews[index]['title'],
+                                    image: filteredNews[index]['image'] ?? "",
+                                    content: filteredNews[index]['content'] ?? "Content not available",
+                                  ),
+                                ),
+                              );
+                            },
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  filteredNews[index]['title']!,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                ClipRRect(
+                                  borderRadius:
+                                      BorderRadius.vertical(top: Radius.circular(15)),
+                                  child: Image.network(
+                                    filteredNews[index]['image'] ??
+                                        "https://via.placeholder.com/150", // Placeholder for missing images
+                                    height: 150,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        Container(
+                                      height: 150,
+                                      color: Colors.grey[300],
+                                      child: Center(child: Icon(Icons.broken_image)),
+                                    ),
                                   ),
                                 ),
-                                SizedBox(height: 4),
-                                Text(
-                                  filteredNews[index]['description']!,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[700],
+                                Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        filteredNews[index]['title'],
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        filteredNews[index]['description'] ?? "No description",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
+                  ),
           ],
         ),
       ),
@@ -230,9 +258,10 @@ class ProfileDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+
         title: Text(name),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: const Color.fromARGB(255, 29, 229, 255),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -285,7 +314,7 @@ class NewsDetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: const Color.fromARGB(255, 68, 255, 249),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
